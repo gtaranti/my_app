@@ -32,11 +32,17 @@ defmodule MyAppWeb.Router do
   # you can use Plug.BasicAuth to set up some basic authentication
   # as long as you are also using SSL (which you should anyway).
   if Mix.env() in [:prod, :dev, :test] do
+    import Plug.BasicAuth
     import Phoenix.LiveDashboard.Router
 
+    pipeline :admins_only do
+      plug :basic_auth, username: "gt", password: "test"
+    end
+
     scope "/" do
-      pipe_through :browser
+      pipe_through [:browser, :admins_only]
       live_dashboard "/dashboard", metrics: MyAppWeb.Telemetry
     end
+
   end
 end
